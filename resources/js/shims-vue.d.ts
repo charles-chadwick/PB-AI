@@ -1,0 +1,12 @@
+declare module '*.vue' {
+    import type { DefineComponent } from 'vue';
+    const component: DefineComponent<{}, {}, any>;
+    export default component;
+}
+
+declare module 'laravel-vite-plugin/inertia-helpers' {
+    export function resolvePageComponent<T>(
+        path: string,
+        pages: Record<string, () => Promise<T>>
+    ): Promise<T>;
+}
