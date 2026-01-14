@@ -75,7 +75,6 @@ class UserTableSeeder extends Seeder
                 ->create([
                     'role' => $role,
                     'first_name' => $first_name,
-                    'middle_name' => $middle_name,
                     'last_name' => $last_name,
                     'email' => str($first_name.'.'.$last_name.rand(100, 999).'@example.com')
                         ->lower()
@@ -148,7 +147,7 @@ class UserTableSeeder extends Seeder
         try {
             $model->addMedia($avatar_path)
                 ->preservingOriginal()
-                ->toMediaCollection('avatars');
+                ->toMediaCollection('avatar');
         } catch (FileDoesNotExist|FileIsTooBig $e) {
             echo $e->getMessage().PHP_EOL;
         }

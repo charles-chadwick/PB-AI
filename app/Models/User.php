@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\IsPerson;
 use App\Traits\Searchable;
 use App\Traits\Sortable;
 use Illuminate\Auth\Authenticatable;
@@ -10,6 +11,7 @@ use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
@@ -23,16 +25,21 @@ class User extends Base implements AuthenticatableContract, AuthorizableContract
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use Authenticatable, Authorizable, CanResetPassword, HasFactory, Notifiable, HasRoles, LogsActivity, InteractsWithMedia;
-    use Searchable, Sortable;
+    use IsPerson, Searchable, Sortable;
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
+    protected $appends = [
+        'avatar_url',
+        'full_name',
+        'initials',
+    ];
+
     protected $fillable = [
         'role',
         'first_name',
-        'middle_name',
         'last_name',
         'email',
         'password',
@@ -64,7 +71,7 @@ class User extends Base implements AuthenticatableContract, AuthorizableContract
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['role', 'first_name', 'middle_name', 'last_name', 'email'])
+            ->logOnly(['role', 'first_name', 'last_name', 'email'])
             ->logOnlyDirty();
     }
 

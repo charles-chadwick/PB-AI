@@ -2,31 +2,44 @@
 
 namespace App\Traits;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
 trait IsPerson
 {
-    public static function bootIsPerson(): void
+    public function avatarUrl(): Attribute
     {
-        static::retrieved(function ($model) {
-            $model->appends = array_merge($model->appends, [
-                'avatar',
-                'full_name',
-                'full_name_with_salutations',
-            ]);
-        });
+        return Attribute::make(
+            get: function () {
+                $path = $this->getFirstMediaPath('avatar');
+                if ($path && file_exists($path)) {
+                    return $this->getFirstMediaUrl('avatar');
+                }
+                return null;
+            }
+        );
     }
 
-    public function getFullNameAttribute(): string
+    public function fullName(): Attribute
     {
-        return "{$this->first_name} {$this->last_name}";
+        return Attribute::make(
+            get: function () {
+                return collect([
+                    $this->first_name,
+                    $this->middle_name,
+                    $this->last_name,
+                ])->filter()->implode(' ');
+            }
+        );
     }
 
-    public function getFullNameWithSalutationsAttribute(): string
+    public function initials(): Attribute
     {
-        return trim($this?->prefix.' '.$this->first_name.' '.$this->last_name.' '.$this?->suffix);
-    }
-
-    public function getInitialsAttribute(): string
-    {
-        return $this->first_name[0].$this->last_name[0];
+        return Attribute::make(
+            get: function () {
+                $first = $this->first_name ?? '';
+                $last = $this->last_name ?? '';
+                return strtoupper(substr($first, 0, 1) . substr($last, 0, 1));
+            }
+        );
     }
 }

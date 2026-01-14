@@ -52,7 +52,7 @@ class UserController extends Controller
     public function create()
     {
         return Inertia::render('Users/Form', [
-            'roles' => array_map(fn($role) => $role->value, UserRole::cases()),
+            'roles' => UserRole::toSelect(),
         ]);
     }
 
