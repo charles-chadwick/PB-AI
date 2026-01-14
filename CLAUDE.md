@@ -157,8 +157,15 @@ resources/js/
 
 ## Commands
 
+This project uses **Laravel Sail** for local development. Always prefix artisan commands with `sail`.
+
+- `sail php artisan <command>` - Run any artisan command
+- `sail php artisan migrate:fresh --seed` - Reset and seed database
+- `sail php artisan tinker` - Interactive REPL
 - `npm run dev` - Start Vite dev server
 - `npm run build` - Build for production
 - `composer run dev` - Start full dev environment
 - `composer run test` - Run PHPUnit tests
 - `./vendor/bin/pint` - Format PHP code
+
+**Important:** Never use `php artisan` directly. Always use `sail php artisan`.
