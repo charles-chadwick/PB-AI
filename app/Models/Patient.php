@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Traits\IsPerson;
 use App\Traits\Searchable;
 use App\Traits\Sortable;
-use Database\Factories\UserFactory;
+use Database\Factories\PatientFactory;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
@@ -25,8 +25,9 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Patient extends Base implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract, HasMedia
 {
-    /** @use HasFactory<UserFactory> */
-    use Authenticatable, Authorizable, CanResetPassword, HasFactory, Notifiable, HasRoles, LogsActivity, InteractsWithMedia;
+    /** @use HasFactory<PatientFactory> */
+    use HasFactory;
+    use Authenticatable, Authorizable, CanResetPassword, Notifiable, HasRoles, LogsActivity, InteractsWithMedia;
     use IsPerson, Searchable, Sortable;
 
     protected $appends = [
