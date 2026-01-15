@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('patient_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('patient_id');
+            $table->string('status')->default('scheduled'); // scheduled, completed, cancelled, no_show
+            $table->string('type');
             $table->string('title');
             $table->text('description')->nullable();
             $table->date('appointment_date');
             $table->time('start_time');
             $table->time('end_time');
-            $table->string('status')->default('scheduled'); // scheduled, completed, cancelled, no_show
-            $table->foreignId('created_by_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('deleted_by_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->unsignedBigInteger('created_by_id')->default(1);
+            $table->unsignedBigInteger('updated_by_id')->nullable();
+            $table->unsignedBigInteger('deleted_by_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

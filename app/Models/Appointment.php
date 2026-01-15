@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\ModelToSelect;
 use App\Traits\Searchable;
 use App\Traits\Sortable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -13,7 +14,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Appointment extends Base
 {
-    use HasFactory, LogsActivity, Searchable, Sortable;
+    use LogsActivity, Searchable, Sortable, ModelToSelect;
 
     protected $fillable = [
         'patient_id',

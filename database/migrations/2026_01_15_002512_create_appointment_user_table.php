@@ -15,8 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('appointment_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->boolean('is_provider')->default(false);
+            $table->unsignedBigInteger('created_by_id')->default(1);
+            $table->unsignedBigInteger('updated_by_id')->nullable();
+            $table->unsignedBigInteger('deleted_by_id')->nullable();
             $table->timestamps();
-
+            $table->softDeletes();
             $table->unique(['appointment_id', 'user_id']);
             $table->index('user_id');
         });
