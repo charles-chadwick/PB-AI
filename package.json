@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "@inertiajs/vue3": "^2.3.8",
+        "@tanstack/vue-table": "^8.21.3",
         "@vitejs/plugin-vue": "^6.0.3",
         "@vueuse/core": "^14.1.0",
         "class-variance-authority": "^0.7.1",
