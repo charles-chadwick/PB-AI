@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -9,4 +10,9 @@ Route::get('/', function () {
 });
 
 Route::resource('users', UserController::class);
+Route::post('users/{entity_id}/avatar', [DocumentController::class, 'uploadAvatar'])->defaults('entity_type', 'users')->name('users.avatar.upload');
+Route::delete('users/{entity_id}/avatar', [DocumentController::class, 'destroyAvatar'])->defaults('entity_type', 'users')->name('users.avatar.destroy');
+
 Route::resource('patients', PatientController::class);
+Route::post('patients/{entity_id}/avatar', [DocumentController::class, 'uploadAvatar'])->defaults('entity_type', 'patients')->name('patients.avatar.upload');
+Route::delete('patients/{entity_id}/avatar', [DocumentController::class, 'destroyAvatar'])->defaults('entity_type', 'patients')->name('patients.avatar.destroy');

@@ -13,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/Components/ui/select';
+import AvatarUpload from '@/Components/AvatarUpload.vue';
 
 interface User {
     id: number;
@@ -21,6 +22,8 @@ interface User {
     middle_name: string | null;
     last_name: string;
     email: string;
+    avatar_url: string | null;
+    initials: string;
 }
 
 const props = defineProps<{
@@ -70,8 +73,9 @@ const back_url = computed(() => {
         </div>
 
         <!-- Form -->
-        <div class="mx-auto max-w-2xl">
-            <form @submit.prevent="submit" class="space-y-6">
+        <div :class="is_editing ? 'mx-auto max-w-5xl' : 'mx-auto max-w-2xl'">
+            <div :class="is_editing ? 'grid grid-cols-1 gap-6 lg:grid-cols-3' : ''">
+                <form @submit.prevent="submit" :class="is_editing ? 'space-y-6 lg:col-span-2' : 'space-y-6'">
                 <!-- Name Fields -->
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     <!-- First Name -->
@@ -198,7 +202,18 @@ const back_url = computed(() => {
                         {{ is_editing ? 'Update User' : 'Create User' }}
                     </Button>
                 </div>
-            </form>
+                </form>
+
+                <!-- Avatar Upload (Only in Edit Mode) -->
+                <div v-if="is_editing" class="lg:col-span-1">
+                    <AvatarUpload
+                        :avatar_url="user!.avatar_url"
+                        :initials="user!.initials"
+                        entity_type="users"
+                        :entity_id="user!.id"
+                    />
+                </div>
+            </div>
         </div>
     </AppLayout>
 </template>

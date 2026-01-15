@@ -7,6 +7,7 @@ import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import { Button } from '@/Components/ui/button';
 import { DatePicker } from '@/Components/ui/date-picker';
+import AvatarUpload from '@/Components/AvatarUpload.vue';
 
 interface Patient {
     id: number;
@@ -15,6 +16,8 @@ interface Patient {
     last_name: string;
     email: string;
     date_of_birth: string;
+    avatar_url: string | null;
+    initials: string;
 }
 
 const props = defineProps<{
@@ -63,8 +66,9 @@ const back_url = computed(() => {
         </div>
 
         <!-- Form -->
-        <div class="mx-auto">
-            <form @submit.prevent="submit" class="space-y-6">
+        <div :class="is_editing ? 'mx-auto max-w-5xl' : 'mx-auto max-w-2xl'">
+            <div :class="is_editing ? 'grid grid-cols-1 gap-6 lg:grid-cols-3' : ''">
+                <form @submit.prevent="submit" :class="is_editing ? 'space-y-6 lg:col-span-2' : 'space-y-6'">
                 <!-- Name Fields -->
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     <!-- First Name -->
@@ -186,7 +190,18 @@ const back_url = computed(() => {
                         {{ is_editing ? 'Update Patient' : 'Create Patient' }}
                     </Button>
                 </div>
-            </form>
+                </form>
+
+                <!-- Avatar Upload (Only in Edit Mode) -->
+                <div v-if="is_editing" class="lg:col-span-1">
+                    <AvatarUpload
+                        :avatar_url="patient!.avatar_url"
+                        :initials="patient!.initials"
+                        entity_type="patients"
+                        :entity_id="patient!.id"
+                    />
+                </div>
+            </div>
         </div>
     </AppLayout>
 </template>
