@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\IsPerson;
 use App\Traits\Searchable;
 use App\Traits\Sortable;
+use Database\Factories\UserFactory;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
@@ -12,6 +13,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
@@ -23,7 +25,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Patient extends Base implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract, HasMedia
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use Authenticatable, Authorizable, CanResetPassword, HasFactory, Notifiable, HasRoles, LogsActivity, InteractsWithMedia;
     use IsPerson, Searchable, Sortable;
 
@@ -65,5 +67,13 @@ class Patient extends Base implements AuthenticatableContract, AuthorizableContr
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('avatar')->singleFile();
+    }
+
+    /**
+     * Get the appointments for this patient.
+     */
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
     }
 }

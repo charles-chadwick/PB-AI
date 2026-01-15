@@ -6,6 +6,7 @@ namespace App\Models;
 use App\Traits\IsPerson;
 use App\Traits\Searchable;
 use App\Traits\Sortable;
+use Database\Factories\UserFactory;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
@@ -13,6 +14,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\LogOptions;
@@ -23,7 +25,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Base implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract, HasMedia
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use Authenticatable, Authorizable, CanResetPassword, HasFactory, Notifiable, HasRoles, LogsActivity, InteractsWithMedia;
     use IsPerson, Searchable, Sortable;
     /**
@@ -78,5 +80,14 @@ class User extends Base implements AuthenticatableContract, AuthorizableContract
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('avatar')->singleFile();
+    }
+
+    /**
+     * Get the appointments assigned to this user.
+     */
+    public function appointments(): BelongsToMany
+    {
+        return $this->belongsToMany(Appointment::class)
+            ->withTimestamps();
     }
 }

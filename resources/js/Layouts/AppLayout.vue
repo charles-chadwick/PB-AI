@@ -17,8 +17,10 @@ const page = usePage<{
 }>();
 
 const navigation_items = [
-  {href: route('users.index'), label: 'Users'},
+  {href: route('dashboard'), label: 'Dashboard'},
+  {href: route('appointments.index'), label: 'Appointments'},
   {href: route('patients.index'), label: 'Patients'},
+  {href: route('users.index'), label: 'Users'},
 ];
 
 const showFlashMessage = () => {
@@ -70,7 +72,12 @@ onUnmounted(() => {
                             v-for="item in navigation_items"
                             :key="item.href"
                             :href="item.href"
-                            class="inline-flex items-center border-b-2 border-primary px-1 pt-1 text-sm font-medium text-foreground"
+                            :class="[
+                              'inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium transition-colors',
+                              item.href === '/'
+                                ? ($page.url === '/' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:border-muted hover:text-foreground')
+                                : ($page.url === item.href || $page.url.startsWith(item.href + '/') ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:border-muted hover:text-foreground')
+                            ]"
                         >
                           {{ item.label }}
                         </Link>
