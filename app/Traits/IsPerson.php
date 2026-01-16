@@ -12,7 +12,8 @@ trait IsPerson
             get: function () {
                 $path = $this->getFirstMediaPath('avatar');
                 if ($path && file_exists($path)) {
-                    return $this->getFirstMediaUrl('avatar');
+                    $url = $this->getFirstMediaUrl('avatar');
+                    return str_replace(config('app.url'), config('app.url').':'.config('app.port'), $url);
                 }
                 return null;
             }

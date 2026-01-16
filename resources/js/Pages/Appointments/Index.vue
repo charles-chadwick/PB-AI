@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { Plus, Eye, Pencil, Trash2, Calendar, Clock, User } from 'lucide-vue-next';
+import { Plus, Eye, Pencil, Trash2, Calendar as CalendarIcon, Clock, List } from 'lucide-vue-next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
@@ -13,6 +14,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/Components/ui/table';
+import FullCalendar from '@fullcalendar/vue3';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import type { CalendarOptions, EventClickArg } from '@fullcalendar/core';
+import axios from 'axios';
 
 interface User {
   id: number;
@@ -56,9 +63,27 @@ interface PaginatedAppointments {
   total: number;
 }
 
+interface CalendarEvent {
+  id: number;
+  title: string;
+  start: string;
+  end: string;
+  backgroundColor: string;
+  borderColor: string;
+  extendedProps: {
+    status: string;
+    patient_name: string;
+    description: string | null;
+  };
+}
+
+type ViewMode = 'table' | 'calendar';
+
 const props = defineProps<{
   appointments: PaginatedAppointments;
 }>();
+
+const view_mode = ref<ViewMode>('calendar');
 
 const delete_appointment = (appointment: Appointment) => {
   if (confirm('Are you sure you want to delete this appointment?')) {
@@ -80,6 +105,40 @@ const get_status_variant = (status: string): 'default' | 'secondary' | 'destruct
       return 'default';
   }
 };
+
+const handle_event_click = (info: EventClickArg) => {
+  const appointment_id = info.event.id;
+  router.visit(route('appointments.show', appointment_id));
+};
+
+const calendar_options: CalendarOptions = {
+  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+  initialView: 'dayGridMonth',
+  headerToolbar: {
+    left: 'prev,next today',
+    center: 'title',
+    right: 'dayGridMonth,timeGridWeek,timeGridDay',
+  },
+  events: (info, success_callback, failure_callback) => {
+    axios.get(route('appointments.calendar'), {
+      params: {
+        start: info.startStr,
+        end: info.endStr,
+      },
+    })
+      .then((response) => {
+        success_callback(response.data);
+      })
+      .catch((error) => {
+        failure_callback(error);
+      });
+  },
+  eventClick: handle_event_click,
+  height: 'auto',
+  nowIndicator: true,
+  slotMinTime: '06:00:00',
+  slotMaxTime: '20:00:00',
+};
 </script>
 
 <template>
@@ -88,9 +147,32 @@ const get_status_variant = (status: string): 'default' | 'secondary' | 'destruct
   <AppLayout title="Appointments">
     <!-- Header Actions -->
     <div class="mb-6 flex items-center justify-between">
-      <p class="text-sm text-muted-foreground">
-        Manage patient appointments
-      </p>
+      <div class="flex items-center gap-4">
+        <p class="text-sm text-muted-foreground">
+          Manage patient appointments
+        </p>
+        <!-- View Toggle -->
+        <div class="flex rounded-md border border-border">
+          <Button
+            :variant="view_mode === 'table' ? 'default' : 'ghost'"
+            size="sm"
+            class="rounded-r-none"
+            @click="view_mode = 'table'"
+          >
+            <List class="mr-2 h-4 w-4" />
+            Table
+          </Button>
+          <Button
+            :variant="view_mode === 'calendar' ? 'default' : 'ghost'"
+            size="sm"
+            class="rounded-l-none"
+            @click="view_mode = 'calendar'"
+          >
+            <CalendarIcon class="mr-2 h-4 w-4" />
+            Calendar
+          </Button>
+        </div>
+      </div>
       <Button as-child>
         <Link :href="route('appointments.create')">
           <Plus class="mr-2 h-4 w-4" />
@@ -99,8 +181,8 @@ const get_status_variant = (status: string): 'default' | 'secondary' | 'destruct
       </Button>
     </div>
 
-    <!-- Appointments Table -->
-    <div class="rounded-md border border-border">
+    <!-- Table View -->
+    <div v-if="view_mode === 'table'" class="rounded-md border border-border">
       <Table>
         <TableHeader>
           <TableRow>
@@ -146,7 +228,7 @@ const get_status_variant = (status: string): 'default' | 'secondary' | 'destruct
             <!-- Date & Time -->
             <TableCell>
               <div class="flex items-center gap-2 text-sm">
-                <Calendar class="h-4 w-4 text-muted-foreground" />
+                <CalendarIcon class="h-4 w-4 text-muted-foreground" />
                 {{ appointment.formatted_date }}
               </div>
               <div class="flex items-center gap-2 text-sm text-muted-foreground">
@@ -209,8 +291,13 @@ const get_status_variant = (status: string): 'default' | 'secondary' | 'destruct
       </Table>
     </div>
 
-    <!-- Pagination -->
-    <div v-if="appointments.last_page > 1" class="mt-4 flex items-center justify-between">
+    <!-- Calendar View -->
+    <div v-else class="rounded-md border border-border bg-card p-4">
+      <FullCalendar :options="calendar_options" />
+    </div>
+
+    <!-- Pagination (only for table view) -->
+    <div v-if="view_mode === 'table' && appointments.last_page > 1" class="mt-4 flex items-center justify-between">
       <p class="text-sm text-muted-foreground">
         Showing {{ (appointments.current_page - 1) * appointments.per_page + 1 }} to
         {{ Math.min(appointments.current_page * appointments.per_page, appointments.total) }} of

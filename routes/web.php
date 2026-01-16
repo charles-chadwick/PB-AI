@@ -18,4 +18,5 @@ Route::resource('patients', PatientController::class);
 Route::post('patients/{entity_id}/avatar', [DocumentController::class, 'uploadAvatar'])->defaults('entity_type', 'patients')->name('patients.avatar.upload');
 Route::delete('patients/{entity_id}/avatar', [DocumentController::class, 'destroyAvatar'])->defaults('entity_type', 'patients')->name('patients.avatar.destroy');
 
+Route::get('appointments/calendar', [AppointmentController::class, 'calendar'])->name('appointments.calendar');
 Route::resource('appointments', AppointmentController::class);

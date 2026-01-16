@@ -6,6 +6,8 @@ use App\Http\Requests\AppointmentRequest;
 use App\Models\Appointment;
 use App\Models\Patient;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AppointmentController extends Controller
@@ -24,6 +26,51 @@ class AppointmentController extends Controller
         return Inertia::render('Appointments/Index', [
             'appointments' => $appointments,
         ]);
+    }
+
+    /**
+     * Get appointments for calendar view (JSON API).
+     */
+    public function calendar(Request $request): JsonResponse
+    {
+        $request->validate([
+            'start' => 'required|date',
+            'end' => 'required|date|after:start',
+        ]);
+
+        $appointments = Appointment::with(['patient'])
+            ->whereBetween('appointment_date', [
+                $request->input('start'),
+                $request->input('end'),
+            ])
+            ->get()
+            ->map(fn (Appointment $appointment) => [
+                'id' => $appointment->id,
+                'title' => $appointment->title . ' - ' . $appointment->patient->full_name,
+                'start' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->start_time->format('H:i:s'),
+                'end' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->end_time->format('H:i:s'),
+                'backgroundColor' => match ($appointment->status) {
+                    'scheduled' => '#3b82f6',
+                    'completed' => '#22c55e',
+                    'cancelled' => '#ef4444',
+                    'no_show' => '#6b7280',
+                    default => '#3b82f6',
+                },
+                'borderColor' => match ($appointment->status) {
+                    'scheduled' => '#2563eb',
+                    'completed' => '#16a34a',
+                    'cancelled' => '#dc2626',
+                    'no_show' => '#4b5563',
+                    default => '#2563eb',
+                },
+                'extendedProps' => [
+                    'status' => $appointment->status,
+                    'patient_name' => $appointment->patient->full_name,
+                    'description' => $appointment->description,
+                ],
+            ]);
+
+        return response()->json($appointments);
     }
 
     /**

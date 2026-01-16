@@ -4,13 +4,13 @@ import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalize
 import { CalendarIcon } from 'lucide-vue-next'
 import { computed, ref, type Ref } from 'vue'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
+import { Button } from '@/Components/ui/button'
+import { Calendar } from '@/Components/ui/calendar'
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/ui/popover'
+} from '@/Components/ui/popover'
 
 const model = defineModel<string>()
 

@@ -47,7 +47,7 @@ const deletePatient = () => {
         <!-- Profile Card -->
         <div class="overflow-hidden rounded-xl border border-border bg-card">
             <!-- Header with gradient background -->
-            <div class="relative bg-gradient-to-r from-primary/10 via-primary/5 to-transparent px-6 pb-0 pt-6">
+            <div class="relative bg-linear-to-r from-primary/10 via-primary/5 to-transparent px-6 pb-0 pt-6">
                 <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
                     <!-- Avatar -->
                     <Avatar class="h-24 w-24 border-4 border-card text-2xl shadow-lg sm:h-28 sm:w-28">

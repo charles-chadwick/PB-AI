@@ -87,8 +87,8 @@ This is an Electronic Health Records (EHR) system built with Laravel 12, Vue 3, 
 
 - **Always use shadcn-vue components** if available at shadcn-vue.com
 - Install components via: `npx shadcn-vue@latest add <component>`
-- Components are installed to `resources/js/components/ui/`
-- Import from `@/components/ui/<component>`
+- Components are installed to `resources/js/Components/ui/`
+- Import from `@/Components/ui/<component>`
 - Do NOT create custom components for functionality shadcn-vue provides
 
 ### Ziggy Routes
@@ -104,6 +104,7 @@ This is an Electronic Health Records (EHR) system built with Laravel 12, Vue 3, 
 - Use semantic color variables (primary, secondary, muted, etc.)
 - Follow mobile-first responsive design (sm:, md:, lg:)
 - Use `clsx` or `tailwind-merge` for conditional classes
+- Use `bg-linear-to-*` for gradients (not `bg-gradient-to-*` which is deprecated in Tailwind v4)
 
 ## File Organization
 
@@ -118,7 +119,7 @@ app/
 └── Traits/          # Reusable model traits
 
 resources/js/
-├── components/ui/   # shadcn-vue components (installed via CLI)
+├── Components/ui/   # shadcn-vue components (installed via CLI)
 ├── Layouts/         # Page layout components
 ├── Pages/           # Inertia page components
 ├── lib/             # Utility functions
