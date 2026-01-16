@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PatientRequest;
 use App\Models\Patient;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
@@ -27,6 +28,45 @@ class PatientController extends Controller
         return Inertia::render('Patients/Index', [
             'patients' => $patients,
         ]);
+    }
+
+    /**
+     * Search for patients by name, date of birth, or ID.
+     */
+    public function search(Request $request)
+    {
+        $query = $request->input('q', '');
+
+        if (empty($query)) {
+            return response()->json([]);
+        }
+
+        $patients = Patient::query()
+            ->where(function ($q) use ($query) {
+                // Search by ID
+                if (is_numeric($query)) {
+                    $q->where('id', $query);
+                }
+
+                // Search by name (first, middle, last)
+                $q->orWhere('first_name', 'LIKE', "%{$query}%")
+                  ->orWhere('middle_name', 'LIKE', "%{$query}%")
+                  ->orWhere('last_name', 'LIKE', "%{$query}%")
+                  ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$query}%"])
+                  ->orWhereRaw("CONCAT(first_name, ' ', middle_name, ' ', last_name) LIKE ?", ["%{$query}%"]);
+
+                // Search by date of birth (YYYY-MM-DD format)
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $query)) {
+                    $q->orWhere('date_of_birth', $query);
+                }
+            })
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->limit(10)
+            ->get(['id', 'first_name', 'middle_name', 'last_name', 'date_of_birth'])
+            ->makeHidden(['avatar_url', 'initials']);
+
+        return response()->json($patients);
     }
 
     /**

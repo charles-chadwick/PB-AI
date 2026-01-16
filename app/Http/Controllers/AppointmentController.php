@@ -31,11 +31,11 @@ class AppointmentController extends Controller
      */
     public function create()
     {
-        $patients = Patient::orderBy('first_name')->get(['id', 'first_name', 'last_name']);
-        $users = User::orderBy('first_name')->get(['id', 'first_name', 'last_name', 'role']);
+        $users = User::orderBy('first_name')
+            ->get(['id', 'first_name', 'last_name', 'role'])
+            ->makeHidden(['avatar_url', 'initials']);
 
         return Inertia::render('Appointments/Form', [
-            'patients' => $patients,
             'users' => $users,
         ]);
     }
@@ -46,11 +46,19 @@ class AppointmentController extends Controller
     public function store(AppointmentRequest $request)
     {
         $validated = $request->validated();
-        $user_ids = $validated['user_ids'];
+        $user_ids = $validated['user_ids'] ?? [];
         unset($validated['user_ids']);
 
+        // Ensure patient_id is an integer
+        if (isset($validated['patient_id'])) {
+            $validated['patient_id'] = (int) $validated['patient_id'];
+        }
+
         $appointment = Appointment::create($validated);
-        $appointment->users()->attach($user_ids);
+
+        if (!empty($user_ids)) {
+            $appointment->users()->attach($user_ids);
+        }
 
         return redirect()
             ->route('appointments.show', $appointment->id)
@@ -75,13 +83,14 @@ class AppointmentController extends Controller
      */
     public function edit(Appointment $appointment)
     {
-        $appointment->load('users');
-        $patients = Patient::orderBy('first_name')->get(['id', 'first_name', 'last_name']);
-        $users = User::orderBy('first_name')->get(['id', 'first_name', 'last_name', 'role']);
+        $appointment->load(['users', 'patient']);
+
+        $users = User::orderBy('first_name')
+            ->get(['id', 'first_name', 'middle_name', 'last_name', 'role'])
+            ->makeHidden(['avatar_url', 'initials']);
 
         return Inertia::render('Appointments/Form', [
             'appointment' => $appointment,
-            'patients' => $patients,
             'users' => $users,
         ]);
     }
@@ -92,11 +101,19 @@ class AppointmentController extends Controller
     public function update(AppointmentRequest $request, Appointment $appointment)
     {
         $validated = $request->validated();
-        $user_ids = $validated['user_ids'];
+        $user_ids = $validated['user_ids'] ?? [];
         unset($validated['user_ids']);
 
+        // Ensure patient_id is an integer
+        if (isset($validated['patient_id'])) {
+            $validated['patient_id'] = (int) $validated['patient_id'];
+        }
+
         $appointment->update($validated);
-        $appointment->users()->sync($user_ids);
+
+        if (!empty($user_ids)) {
+            $appointment->users()->sync($user_ids);
+        }
 
         return redirect()
             ->route('appointments.show', $appointment->id)
