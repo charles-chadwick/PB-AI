@@ -19,6 +19,7 @@ class Appointment extends Base
     protected $fillable = [
         'patient_id',
         'title',
+        'type',
         'description',
         'appointment_date',
         'start_time',

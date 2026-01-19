@@ -133,7 +133,7 @@ class AppointmentController extends Controller
         $appointment->load(['users', 'patient']);
 
         $users = User::orderBy('first_name')
-            ->get(['id', 'first_name', 'middle_name', 'last_name', 'role'])
+            ->get(['id', 'first_name', 'last_name', 'role'])
             ->makeHidden(['avatar_url', 'initials']);
 
         return Inertia::render('Appointments/Form', [

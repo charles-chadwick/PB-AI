@@ -27,6 +27,7 @@ class AppointmentRequest extends FormRequest
         return [
             'patient_id' => 'required|exists:patients,id',
             'title' => 'required|string|max:255',
+            'type' => 'required|string|max:255',
             'description' => 'nullable|string',
             'appointment_date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
