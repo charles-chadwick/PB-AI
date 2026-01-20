@@ -39,7 +39,7 @@ trait IsPerson
             get: function () {
                 $first = $this->first_name ?? '';
                 $last = $this->last_name ?? '';
-                return strtoupper(substr($first, 0, 1) . substr($last, 0, 1));
+                return mb_strtoupper(mb_substr($first, 0, 1) . mb_substr($last, 0, 1));
             }
         );
     }

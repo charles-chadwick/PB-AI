@@ -109,7 +109,25 @@ class PatientController extends Controller
     public function show(Patient $patient)
     {
         $patient->load(['created_by']);
-        return Inertia::render('Patients/Show', ['patient' => $patient]);
+
+        $appointments = $patient->appointments()
+            ->with(['users' => function ($query) {
+                $query->select('users.id', 'first_name', 'last_name', 'role')
+                    ->without(['created_by', 'updated_by', 'deleted_by']);
+            }])
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('start_time', 'desc')
+            ->get();
+
+        $users = \App\Models\User::orderBy('first_name')
+            ->get(['id', 'first_name', 'last_name', 'role'])
+            ->makeHidden(['avatar_url', 'initials', 'full_name']);
+
+        return Inertia::render('Patients/Show', [
+            'patient' => $patient,
+            'appointments' => $appointments,
+            'users' => $users,
+        ]);
     }
 
     /**
