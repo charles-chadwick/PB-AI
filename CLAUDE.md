@@ -4,6 +4,10 @@
 
 This is an Electronic Health Records (EHR) system built with Laravel 12, Vue 3, and TypeScript using Inertia.js for SPA functionality.
 
+## General Behavior
+
+- **Always run commands directly** - Do not ask for permission before running commands. Execute them immediately when needed.
+
 ## Tech Stack
 
 - **Backend:** Laravel 12 (PHP 8.2+)
