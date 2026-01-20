@@ -2,7 +2,7 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ArrowLeft, Pencil, Trash2, Mail, Shield, Calendar } from 'lucide-vue-next';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import AvatarWithModal from '@/Components/AvatarWithModal.vue';
 import { Button } from '@/Components/ui/button';
 
 interface User {
@@ -50,10 +50,12 @@ const deleteUser = () => {
             <div class="relative bg-gradient-to-r from-primary/10 via-primary/5 to-transparent px-6 pb-0 pt-6">
                 <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
                     <!-- Avatar -->
-                    <Avatar class="h-24 w-24 border-4 border-card text-2xl shadow-lg sm:h-28 sm:w-28">
-                        <AvatarImage v-if="user.avatar_url" :src="user.avatar_url" />
-                        <AvatarFallback class="bg-primary/10 text-primary">{{ user.initials }}</AvatarFallback>
-                    </Avatar>
+                    <AvatarWithModal
+                        :avatar_url="user.avatar_url"
+                        :initials="user.initials"
+                        :full_name="user.full_name"
+                        size="lg"
+                    />
 
                     <!-- Name and Role -->
                     <div class="flex flex-1 flex-col items-center pb-4 text-center sm:items-start sm:text-left">

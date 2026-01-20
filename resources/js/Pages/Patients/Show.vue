@@ -2,8 +2,31 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ArrowLeft, Pencil, Trash2, Mail, Cake, Calendar } from 'lucide-vue-next';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import AvatarWithModal from '@/Components/AvatarWithModal.vue';
+import PatientAppointments from '@/Components/PatientAppointments.vue';
 import { Button } from '@/Components/ui/button';
+
+interface User {
+    id: number;
+    first_name: string;
+    last_name: string;
+    role: string;
+}
+
+interface Appointment {
+    id: number;
+    patient_id: number;
+    title: string;
+    type: string;
+    description: string | null;
+    appointment_date: string;
+    start_time: string;
+    end_time: string;
+    status: string;
+    formatted_date: string;
+    formatted_time: string;
+    users: User[];
+}
 
 interface Patient {
     id: number;
@@ -20,6 +43,8 @@ interface Patient {
 
 const props = defineProps<{
     patient: Patient;
+    appointments: Appointment[];
+    users: User[];
 }>();
 
 const deletePatient = () => {
@@ -50,10 +75,12 @@ const deletePatient = () => {
             <div class="relative bg-linear-to-r from-primary/10 via-primary/5 to-transparent px-6 pb-0 pt-6">
                 <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
                     <!-- Avatar -->
-                    <Avatar class="h-24 w-24 border-4 border-card text-2xl shadow-lg sm:h-28 sm:w-28">
-                        <AvatarImage v-if="patient.avatar_url" :src="patient.avatar_url" />
-                        <AvatarFallback class="bg-primary/10 text-primary">{{ patient.initials }}</AvatarFallback>
-                    </Avatar>
+                    <AvatarWithModal
+                        :avatar_url="patient.avatar_url"
+                        :initials="patient.initials"
+                        :full_name="patient.full_name"
+                        size="lg"
+                    />
 
                     <!-- Name -->
                     <div class="flex flex-1 flex-col items-center pb-4 text-center sm:items-start sm:text-left">
@@ -112,6 +139,15 @@ const deletePatient = () => {
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Appointments Section -->
+        <div class="mt-6 rounded-xl border border-border bg-card p-6">
+            <PatientAppointments
+                :patient_id="patient.id"
+                :appointments="appointments"
+                :users="users"
+            />
         </div>
     </AppLayout>
 </template>
