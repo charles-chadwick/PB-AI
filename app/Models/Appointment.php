@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AppointmentStatus;
 use App\Traits\ModelToSelect;
 use App\Traits\Searchable;
 use App\Traits\Sortable;
@@ -39,6 +40,7 @@ class Appointment extends Base
             'appointment_date' => 'date',
             'start_time' => 'datetime:H:i',
             'end_time' => 'datetime:H:i',
+            'status' => AppointmentStatus::class,
         ];
     }
 

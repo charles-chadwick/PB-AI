@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\AppointmentStatus;
 use App\Enums\AppointmentType;
 use App\Models\Appointment;
 use App\Models\Patient;
@@ -188,26 +189,26 @@ class AppointmentSeeder extends Seeder
      * Past appointments are more likely to be completed or cancelled.
      * Future appointments are always scheduled.
      */
-    private function getRandomStatus(Carbon $appointment_date): string
+    private function getRandomStatus(Carbon $appointment_date): AppointmentStatus
     {
         $now = Carbon::now();
 
         // Future appointments are always scheduled
         if ($appointment_date->isFuture()) {
-            return 'scheduled';
+            return AppointmentStatus::Scheduled;
         }
 
         // Past appointments
         $rand = rand(1, 100);
 
         if ($rand <= 70) {
-            return 'completed';
+            return AppointmentStatus::Completed;
         } elseif ($rand <= 85) {
-            return 'cancelled';
+            return AppointmentStatus::Cancelled;
         } elseif ($rand <= 95) {
-            return 'no_show';
+            return AppointmentStatus::NoShow;
         } else {
-            return 'scheduled';
+            return AppointmentStatus::Scheduled;
         }
     }
 }

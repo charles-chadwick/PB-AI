@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AppointmentStatus;
 use App\Http\Requests\AppointmentRequest;
 use App\Models\Appointment;
 use App\Models\Patient;
@@ -50,21 +51,21 @@ class AppointmentController extends Controller
                 'start' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->start_time->format('H:i:s'),
                 'end' => $appointment->appointment_date->format('Y-m-d') . 'T' . $appointment->end_time->format('H:i:s'),
                 'backgroundColor' => match ($appointment->status) {
-                    'scheduled' => '#3b82f6',
-                    'completed' => '#22c55e',
-                    'cancelled' => '#ef4444',
-                    'no_show' => '#6b7280',
+                    AppointmentStatus::Scheduled => '#3b82f6',
+                    AppointmentStatus::Completed => '#22c55e',
+                    AppointmentStatus::Cancelled => '#ef4444',
+                    AppointmentStatus::NoShow => '#6b7280',
                     default => '#3b82f6',
                 },
                 'borderColor' => match ($appointment->status) {
-                    'scheduled' => '#2563eb',
-                    'completed' => '#16a34a',
-                    'cancelled' => '#dc2626',
-                    'no_show' => '#4b5563',
+                    AppointmentStatus::Scheduled => '#2563eb',
+                    AppointmentStatus::Completed => '#16a34a',
+                    AppointmentStatus::Cancelled => '#dc2626',
+                    AppointmentStatus::NoShow => '#4b5563',
                     default => '#2563eb',
                 },
                 'extendedProps' => [
-                    'status' => $appointment->status,
+                    'status' => $appointment->status->value,
                     'patient_name' => $appointment->patient->full_name,
                     'description' => $appointment->description,
                 ],

@@ -44,6 +44,7 @@ interface Patient {
 const props = defineProps<{
     patient: Patient;
     appointments: Appointment[];
+    total_appointments: number;
     users: User[];
 }>();
 
@@ -146,6 +147,7 @@ const deletePatient = () => {
             <PatientAppointments
                 :patient_id="patient.id"
                 :appointments="appointments"
+                :total_appointments="total_appointments"
                 :users="users"
             />
         </div>

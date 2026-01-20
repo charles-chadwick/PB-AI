@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useForm } from '@inertiajs/vue3'
-import { Calendar, Clock, Pencil, Trash2, Plus } from 'lucide-vue-next'
+import axios from 'axios'
+import { Calendar, Clock, Pencil, Trash2, Plus, Loader2 } from 'lucide-vue-next'
 import { Button } from '@/Components/ui/button'
 import { Badge } from '@/Components/ui/badge'
 import {
@@ -48,10 +49,16 @@ interface Appointment {
 interface Props {
   patient_id: number
   appointments: Appointment[]
+  total_appointments: number
   users: User[]
 }
 
 const props = defineProps<Props>()
+
+// Lazy loading state
+const all_appointments = ref<Appointment[]>([...props.appointments])
+const is_loading_more = ref(false)
+const has_more = computed(() => all_appointments.value.length < props.total_appointments)
 
 const is_open = ref(false)
 const editing_appointment = ref<Appointment | null>(null)
@@ -67,6 +74,28 @@ const form = useForm({
   status: 'scheduled',
   user_ids: [] as number[],
 })
+
+const load_more_appointments = async () => {
+  if (is_loading_more.value || !has_more.value) {
+    return
+  }
+
+  is_loading_more.value = true
+
+  try {
+    const response = await axios.get(route('patients.appointments.load-more', props.patient_id), {
+      params: {
+        offset: all_appointments.value.length
+      }
+    })
+
+    all_appointments.value = [...all_appointments.value, ...response.data]
+  } catch (error) {
+    console.error('Error loading more appointments:', error)
+  } finally {
+    is_loading_more.value = false
+  }
+}
 
 const open_edit_modal = (appointment: Appointment) => {
   editing_appointment.value = appointment
@@ -164,9 +193,9 @@ const get_user_full_name = (user: User) => {
     </div>
 
     <!-- Appointments List -->
-    <div v-if="appointments.length > 0" class="space-y-3">
+    <div v-if="all_appointments.length > 0" class="space-y-3">
       <div
-        v-for="appointment in appointments"
+        v-for="appointment in all_appointments"
         :key="appointment.id"
         class="group rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50"
       >
@@ -216,6 +245,18 @@ const get_user_full_name = (user: User) => {
             </Button>
           </div>
         </div>
+      </div>
+
+      <!-- Load More Button -->
+      <div v-if="has_more" class="flex justify-center pt-2">
+        <Button
+          variant="outline"
+          @click="load_more_appointments"
+          :disabled="is_loading_more"
+        >
+          <Loader2 v-if="is_loading_more" class="mr-2 h-4 w-4 animate-spin" />
+          {{ is_loading_more ? 'Loading...' : 'Load More' }}
+        </Button>
       </div>
     </div>
 

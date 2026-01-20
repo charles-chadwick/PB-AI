@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\AppointmentStatus;
 use App\Models\Appointment;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Validator;
 
 class AppointmentRequest extends FormRequest
@@ -32,7 +34,7 @@ class AppointmentRequest extends FormRequest
             'appointment_date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
-            'status' => 'required|in:scheduled,completed,cancelled,no_show',
+            'status' => ['required', new Enum(AppointmentStatus::class)],
             'user_ids' => 'required|array|min:1',
             'user_ids.*' => 'required|exists:users,id',
         ];
@@ -66,7 +68,7 @@ class AppointmentRequest extends FormRequest
 
         $overlapping = Appointment::where('patient_id', $patient_id)
             ->where('appointment_date', $appointment_date)
-            ->where('status', '!=', 'cancelled')
+            ->where('status', '!=', AppointmentStatus::Cancelled)
             ->where(function ($query) use ($start_time, $end_time) {
                 $query->whereBetween('start_time', [$start_time, $end_time])
                     ->orWhereBetween('end_time', [$start_time, $end_time])
@@ -100,7 +102,7 @@ class AppointmentRequest extends FormRequest
         $appointment_id = $this->route('appointment')?->id;
 
         $overlapping = Appointment::where('appointment_date', $appointment_date)
-            ->where('status', '!=', 'cancelled')
+            ->where('status', '!=', AppointmentStatus::Cancelled)
             ->where(function ($query) use ($start_time, $end_time) {
                 $query->whereBetween('start_time', [$start_time, $end_time])
                     ->orWhereBetween('end_time', [$start_time, $end_time])

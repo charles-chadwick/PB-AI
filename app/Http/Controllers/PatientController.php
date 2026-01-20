@@ -117,7 +117,10 @@ class PatientController extends Controller
             }])
             ->orderBy('appointment_date', 'desc')
             ->orderBy('start_time', 'desc')
+            ->limit(5)
             ->get();
+
+        $total_appointments = $patient->appointments()->count();
 
         $users = \App\Models\User::orderBy('first_name')
             ->get(['id', 'first_name', 'last_name', 'role'])
@@ -126,8 +129,32 @@ class PatientController extends Controller
         return Inertia::render('Patients/Show', [
             'patient' => $patient,
             'appointments' => $appointments,
+            'total_appointments' => $total_appointments,
             'users' => $users,
         ]);
+    }
+
+    /**
+     * Load more appointments for a patient (AJAX endpoint).
+     */
+    public function loadMoreAppointments(Request $request, Patient $patient)
+    {
+        $request->validate([
+            'offset' => 'required|integer|min:0',
+        ]);
+
+        $appointments = $patient->appointments()
+            ->with(['users' => function ($query) {
+                $query->select('users.id', 'first_name', 'last_name', 'role')
+                    ->without(['created_by', 'updated_by', 'deleted_by']);
+            }])
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('start_time', 'desc')
+            ->offset($request->input('offset'))
+            ->limit(5)
+            ->get();
+
+        return response()->json($appointments);
     }
 
     /**
