@@ -18,7 +18,10 @@ class DashboardController extends Controller
         $new_patients_this_month = Patient::whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
-        $recent_patients = Patient::with('created_by')
+        $recent_patients = Patient::with(['created_by' => function ($query) {
+                $query->select('id', 'first_name', 'last_name')
+                    ->without(['created_by', 'updated_by', 'deleted_by']);
+            }])
             ->latest()
             ->limit(5)
             ->get();
